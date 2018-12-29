@@ -9,18 +9,17 @@ import (
 	"strings"
 )
 
-
-var GradeValues = map[string]float64 {
-	"A": 4.00,
+var GradeValues = map[string]float64{
+	"A":  4.00,
 	"A-": 3.67,
 	"B+": 3.33,
-	"B": 3.00,
+	"B":  3.00,
 	"B-": 2.67,
 	"C+": 2.33,
-	"C": 2.00,
+	"C":  2.00,
 	"C-": 1.67,
-	"D": 1.00,
-	"F": 0.00,
+	"D":  1.00,
+	"F":  0.00,
 }
 
 var usage = `gpa - Calculate the gpa given a series of (grade, weight) pairs.
@@ -30,12 +29,10 @@ Usage:
 	gpa [<file>]
 `
 
-
 type Grade struct {
-	grade string
+	grade   string
 	credits int
 }
-
 
 func (g *Grade) QualityPoints() (float64, error) {
 	if value, ok := GradeValues[g.grade]; ok {
@@ -45,7 +42,6 @@ func (g *Grade) QualityPoints() (float64, error) {
 	}
 }
 
-
 func argvGrades(grades chan<- Grade) {
 	for i := 1; i < len(os.Args); i += 2 {
 		grade := os.Args[i]
@@ -54,12 +50,11 @@ func argvGrades(grades chan<- Grade) {
 			panic(err)
 		}
 
-		grades <- Grade{ grade, credits }
+		grades <- Grade{grade, credits}
 	}
 
 	close(grades)
 }
-
 
 func fileGrades(file *os.File, grades chan<- Grade) {
 	scanner := bufio.NewScanner(os.Stdin)
@@ -74,12 +69,11 @@ func fileGrades(file *os.File, grades chan<- Grade) {
 			panic(err)
 		}
 
-		grades <- Grade{ grade, credits }
+		grades <- Grade{grade, credits}
 	}
 
 	close(grades)
 }
-
 
 func totalStats(grades <-chan Grade, gpa chan<- float64) {
 	total_points := 0.0
@@ -91,12 +85,11 @@ func totalStats(grades <-chan Grade, gpa chan<- float64) {
 		if err != nil {
 			panic(err)
 		}
-		total_points += quality_points		
+		total_points += quality_points
 	}
 
 	gpa <- total_points / float64(total_credits)
 }
-
 
 func main() {
 	grades := make(chan Grade)
